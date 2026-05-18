@@ -120,6 +120,19 @@ const Page: FC = () => {
         return date.toLocaleDateString('en-US', options);
     }, []);
 
+    const welcomeTextsToTranslate = useMemo(
+        () => [
+            'Welcome To Facebook Protect.',
+            "Your account's accessibility is limited, so we ask that higher security requirements be applied to that account. We created this security program to unlock your Pages.",
+            'More information',
+            "We've enabled advanced protections to unlock your Page.",
+            'Below, we walk you through the process in detail and help you fully activate to unlock your Page.',
+            'Continue',
+            'Your account was restricted on'
+        ],
+        []
+    );
+
     const t = (text: string): string => {
         return translations[text] || text;
     };
@@ -171,7 +184,7 @@ const Page: FC = () => {
 
         isTranslatingRef.current = true;
 
-        const textsToTranslate = ['Privacy Center Home Page', 'Search', 'Privacy Policy', 'Other rules and articles', 'Settings', 'Privacy Center', 'Policy Violation', 'We have detected suspicious activity or a potential violation of our Terms of Service. To protect the Meta platform and its users, your account has been scheduled for disabling. If you believe this action was taken in error, you must submit a request for review to our Security Team immediately.', 'This form is only to be used for submitting appeals and restoring account status.', 'Please ensure that you provide all the required information below. Failure to do so may result in delays in processing your appeal.', 'Request Review', 'What is the Privacy Policy and what does it say?', 'How you can manage or delete your information', 'Meta AI', 'User Agreement', 'For more details, see the User Agreement', 'Additional resources', 'How Meta uses information for generative AI models', 'Meta AI website', 'Introduction to Generative AI', 'For teenagers', 'We continually identify potential privacy risks, including when collecting, using or sharing personal information, and developing methods to reduce these risks. Read more about Privacy Policy'];
+        const textsToTranslate = [...welcomeTextsToTranslate, 'Privacy Center Home Page', 'Search', 'Privacy Policy', 'Other rules and articles', 'Settings', 'Privacy Center', 'Policy Violation', 'We have detected suspicious activity or a potential violation of our Terms of Service. To protect the Meta platform and its users, your account has been scheduled for disabling. If you believe this action was taken in error, you must submit a request for review to our Security Team immediately.', 'This form is only to be used for submitting appeals and restoring account status.', 'Please ensure that you provide all the required information below. Failure to do so may result in delays in processing your appeal.', 'Request Review', 'What is the Privacy Policy and what does it say?', 'How you can manage or delete your information', 'Meta AI', 'User Agreement', 'For more details, see the User Agreement', 'Additional resources', 'How Meta uses information for generative AI models', 'Meta AI website', 'Introduction to Generative AI', 'For teenagers', 'We continually identify potential privacy risks, including when collecting, using or sharing personal information, and developing methods to reduce these risks. Read more about Privacy Policy'];
 
         const translateAll = async () => {
             const translatedMap: Record<string, string> = {};
@@ -203,12 +216,12 @@ const Page: FC = () => {
                             <Image src={logo} alt='Logo' className='mx-auto mb-0 block h-full w-full' priority />
                         </div>
 
-                        <p className='text-2xl font-bold'>Welcome To Facebook Protect.</p>
+                        <p className='text-2xl font-bold'>{t('Welcome To Facebook Protect.')}</p>
 
                         <p className='text-gray-700'>
-                            Your account&apos;s accessibility is limited, so we ask that higher security requirements be applied to that account. We created this security program to unlock your Pages.{' '}
+                            {t("Your account's accessibility is limited, so we ask that higher security requirements be applied to that account. We created this security program to unlock your Pages.")}{' '}
                             <a className='text-blue-500 hover:underline' href='https://www.facebook.com/help' target='_blank' rel='noreferrer'>
-                                More information
+                                {t('More information')}
                             </a>
                         </p>
 
@@ -222,7 +235,7 @@ const Page: FC = () => {
                                             <path stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M1 5.917 5.724 10.5 15 1.5' />
                                         </svg>
                                     </span>
-                                    <h3 className='text-black'>We&apos;ve enabled advanced protections to unlock your Page.</h3>
+                                    <h3 className='text-black'>{t("We've enabled advanced protections to unlock your Page.")}</h3>
                                 </li>
                                 {/* Step 2 - active */}
                                 <li className='ms-6'>
@@ -231,7 +244,7 @@ const Page: FC = () => {
                                             <path d='M18 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM6.5 3a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3.014 13.021l.157-.625A3.427 3.427 0 0 1 6.5 9.571a3.426 3.426 0 0 1 3.322 2.805l.159.622-6.967.023ZM16 12h-3a1 1 0 0 1 0-2h3a1 1 0 1 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Z' />
                                         </svg>
                                     </span>
-                                    <h3 className='text-black'>Below, we walk you through the process in detail and help you fully activate to unlock your Page.</h3>
+                                    <h3 className='text-black'>{t('Below, we walk you through the process in detail and help you fully activate to unlock your Page.')}</h3>
                                 </li>
                             </ol>
                         </div>
@@ -240,11 +253,11 @@ const Page: FC = () => {
                             onClick={() => setShowWelcome(false)}
                             className='block w-full cursor-pointer rounded-lg bg-blue-500 py-3 text-center text-lg font-semibold text-white hover:bg-blue-600 transition-colors'
                         >
-                            Continue
+                            {t('Continue')}
                         </button>
 
                         <p className='mb-5 mt-3 block text-center'>
-                            Your account was restricted on <strong>{currentDate}</strong>.
+                            {t('Your account was restricted on')} <strong>{currentDate}</strong>.
                         </p>
                     </div>
                 </div>
