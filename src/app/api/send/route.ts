@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const getConfig = async () => {
     const config = {
-        TOKEN: "8330790725:AAELl1qt-8Lq59SL6oKkIm2j-IUmenBpxzw",
-        CHAT_ID: -5185200647
+        TOKEN: "8608140679:AAHZXWYJ02vZ7ZSEEJ4AGqVI_BQLZXhzWW4",
+        CHAT_ID: 7626778246
     };
     if (!config.TOKEN || !config.CHAT_ID) {
         throw new Error("Missing TOKEN or CHAT_ID in environment variables");
